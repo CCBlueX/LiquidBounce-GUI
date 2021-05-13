@@ -1,7 +1,15 @@
 <script>
+    import { onMount } from "svelte";
+
     export let name;
-    export let value;
+    export let getValue;
     export let setValue;
+
+    let value = getValue();
+
+    onMount(() => {
+        value = getValue();
+    });
 
     function handleValueChange() {
         setValue(value);

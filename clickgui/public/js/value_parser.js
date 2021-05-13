@@ -3,7 +3,7 @@ const valueParser = {
         return {
             type: "boolean",
             name: value.getName(),
-            value: value.get(),
+            getValue: value.get,
             setValue: value.set
         };
     },
@@ -28,10 +28,11 @@ const valueParser = {
     },
     parseToggleable(value) {
         return {
-            type: "boolean",
+            type: "togglable",
             name: value.getName(),
-            value: value.get(),
-            setValue: value.set
+            getValue: value.get,
+            setValue: value.set,
+            settings: valueParser.parse(value.get())
         };
     },
     parseIntRange(value) {
@@ -43,19 +44,20 @@ const valueParser = {
             min: range.getStart(),
             max: range.getEndInclusive(),
             step: 1,
-            value1: v.getStart(),
-            value2: v.getEndInclusive(),
-            setValue1: (newValue) => {
-                value.set(kotlin.intRange(newValue | 0, v.getEndInclusive()))
-            },
-            setValue2: (newValue) => {
-                value.set(kotlin.intRange(v.getStart(), newValue | 0));
-            }
+            getValue: () => [v.getStart(), v.getEndInclusive()],
+            setValue: [
+                newValue => {
+                    value.set(kotlin.intRange(newValue | 0, v.getEndInclusive()))  
+                },
+                newValue => {
+                    value.set(kotlin.intRange(v.getStart(), newValue | 0));
+                }
+            ]
         };
     },
     parse(values) {
         const parsedValues = [];
-        const excludedValues = ["hidden", "enabled", "bind"];
+        const excludedValues = ["Hidden", "Enabled", "bind"];
 
         for (let i = 0; i < values.length; i++) {
             const v = values[i];

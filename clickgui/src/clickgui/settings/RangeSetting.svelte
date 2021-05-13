@@ -5,28 +5,28 @@
     export let min;
     export let max;
     export let step;
-    export let value1;
-    export let value2;
-    export let setValue1;
-    export let setValue2;
+    export let getValue;
+    export let setValue;
 
-    let multi = value2 !== null;
+    let value = getValue();
+    let multi = false;
 
     let valueString;
     function updateValueString() {
         if (multi) {
-            valueString = `${value1} - ${value2}`
+            valueString = `${value[0]} - ${value[1]}`
         } else {
-            valueString = value1.toString();
+            valueString = value[0].toString();
         }
     }
 
     let slider = null;
     onMount(() => {
-        const start = [value1];
-        if (multi) {
-            start.push(value2);
-        }
+        console.log(getValue());
+        multi = value.length > 1;
+        updateValueString();
+
+        const start = value;
         let connect = "lower";
         if (multi) {
             connect = true;
@@ -44,11 +44,10 @@
         });
 
         slider.noUiSlider.on("update", values => {
-            value1 = parseFloat(values[0]);
-            setValue1(value1);
+            value = values.map(parseFloat);
+            setValue[0](value[0]);
             if (multi) {
-                value2 = parseFloat(values[1]);
-                setValue2(value2);
+                setValue[1](value[1]);
             }
 
             updateValueString();

@@ -31,9 +31,10 @@
         margin-top: 5px;
         color: white;
         transition: ease border-bottom 0.2s;
+        border: solid 2px transparent;
     }
 
     input:focus {
-        border-bottom: solid 2px #4677ff;
+        border: solid 2px #4677ff;
     }
 </style>

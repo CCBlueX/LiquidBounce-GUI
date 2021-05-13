@@ -79,7 +79,7 @@
     </div>
     <div class="modules">
         {#each renderedModules as m}
-            <div transition:slide|global={{duration: 400, easing: sineInOut}}>
+            <div transition:slide={{duration: 400, easing: sineInOut}}>
                 <Module name={m.name} enabled={m.enabled} settings={m.settings} setEnabled={m.setEnabled} />
             </div>
         {/each}
@@ -91,7 +91,6 @@
         border-radius: 5px;
         overflow: hidden;
         width: 225px;
-        border: solid 1px rgba(0, 0, 0, 0.68);
         position: absolute;
     }
 

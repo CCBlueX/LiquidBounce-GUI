@@ -7,6 +7,7 @@
     import ListSetting from "./settings/ListSetting.svelte";
     import ColorSetting from "./settings/ColorSetting.svelte";
     import TextSetting from "./settings/TextSetting.svelte";
+    import TogglableSetting from "./settings/TogglableSetting.svelte";
 
     export let name;
     export let enabled;
@@ -29,18 +30,20 @@
 <div>
     <div on:mousedown={handleToggleSettings} on:click={handleToggle} class:has-settings={settings.length > 0} class:enabled={enabled} class:expanded={expanded} class="module">{name}</div>
     {#if expanded}
-        <div class="settings" transition:slide|global={{duration: 400, easing: sineInOut}}>
+        <div class="settings" transition:slide={{duration: 400, easing: sineInOut}}>
             {#each settings as s}
                 {#if s.type === "boolean"}
-                    <BooleanSetting name={s.name} value={s.value} setValue={s.setValue}></BooleanSetting>
+                    <BooleanSetting {...s} />
                 {:else if s.type === "range"}
-                    <RangeSetting name={s.name} min={s.min} max={s.max} step={s.step} value1={s.value1} value2={s.value2} setValue1={s.setValue1} setValue2={s.setValue2}></RangeSetting>
+                    <RangeSetting {...s} />
                 {:else if s.type === "list"}
-                    <ListSetting name={s.name} values={s.values} value={s.value}></ListSetting>
+                    <ListSetting {...s} />
                 {:else if s.type === "color"}
-                    <ColorSetting name={s.name} value={s.value.toUpperCase()}></ColorSetting>
+                    <ColorSetting {...s} />
                 {:else if s.type === "text"}
-                    <TextSetting name={s.name} value={s.value}></TextSetting>
+                    <TextSetting {...s} />
+                {:else if s.type === "togglable"}
+                    <TogglableSetting {...s} />
                 {/if}
             {/each}
         </div>
