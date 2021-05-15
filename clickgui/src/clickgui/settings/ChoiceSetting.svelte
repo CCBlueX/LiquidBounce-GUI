@@ -1,6 +1,6 @@
 <script>
     import { sineInOut } from "svelte/easing";
-    import { slide } from "svelte/transition";
+    import { fade, slide } from "svelte/transition";
     import GenericSetting from "./GenericSetting.svelte";
 
     export let instance;
@@ -48,7 +48,7 @@
     {/if}
 
     {#if settings.length > 0}
-        <div class="settings" transition:slide|local={{duration: 400, easing: sineInOut}}>
+        <div class="settings" transition:fade|local={{duration: 200, easing: sineInOut}}>
             {#each settings as s}
                 <GenericSetting instance={s} />
             {/each}

@@ -3,7 +3,7 @@
 
     let clickGuiOpened = true;
 
-    const categories = ["Combat", "Render", "Misc"];
+    const categories = ["Combat", "Render", "Misc", "Movement"];
     const modules = [];
     
     try {

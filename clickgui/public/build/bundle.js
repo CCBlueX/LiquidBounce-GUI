@@ -636,6 +636,15 @@ var app = (function () {
         return -0.5 * (Math.cos(Math.PI * t) - 1);
     }
 
+    function fade(node, { delay = 0, duration = 400, easing = identity } = {}) {
+        const o = +getComputedStyle(node).opacity;
+        return {
+            delay,
+            duration,
+            easing,
+            css: t => `opacity: ${t * o}`
+        };
+    }
     function slide(node, { delay = 0, duration = 400, easing = cubicOut } = {}) {
         const style = getComputedStyle(node);
         const opacity = +style.opacity;
@@ -1418,7 +1427,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "settings svelte-1yphppm");
-    			add_location(div, file$5, 44, 8, 1256);
+    			add_location(div, file$5, 44, 8, 1255);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -1429,9 +1438,7 @@ var app = (function () {
 
     			current = true;
     		},
-    		p: function update(new_ctx, dirty) {
-    			ctx = new_ctx;
-
+    		p: function update(ctx, dirty) {
     			if (dirty & /*settings*/ 2) {
     				each_value = /*settings*/ ctx[1];
     				validate_each_argument(each_value);
@@ -1467,10 +1474,12 @@ var app = (function () {
     				transition_in(each_blocks[i]);
     			}
 
-    			add_render_callback(() => {
-    				if (!div_transition) div_transition = create_bidirectional_transition(div, slide, { duration: 400, easing: sineInOut }, true);
-    				div_transition.run(1);
-    			});
+    			if (local) {
+    				add_render_callback(() => {
+    					if (!div_transition) div_transition = create_bidirectional_transition(div, fade, { duration: 200 }, true);
+    					div_transition.run(1);
+    				});
+    			}
 
     			current = true;
     		},
@@ -1481,8 +1490,11 @@ var app = (function () {
     				transition_out(each_blocks[i]);
     			}
 
-    			if (!div_transition) div_transition = create_bidirectional_transition(div, slide, { duration: 400, easing: sineInOut }, false);
-    			div_transition.run(0);
+    			if (local) {
+    				if (!div_transition) div_transition = create_bidirectional_transition(div, fade, { duration: 200 }, false);
+    				div_transition.run(0);
+    			}
+
     			current = false;
     		},
     		d: function destroy(detaching) {
@@ -1583,19 +1595,19 @@ var app = (function () {
     			if (if_block) if_block.c();
     			attr_dev(input, "type", "checkbox");
     			attr_dev(input, "class", "svelte-1yphppm");
-    			add_location(input, file$5, 35, 16, 1002);
+    			add_location(input, file$5, 35, 16, 1001);
     			attr_dev(span, "class", "slider svelte-1yphppm");
-    			add_location(span, file$5, 36, 16, 1096);
+    			add_location(span, file$5, 36, 16, 1095);
     			attr_dev(div0, "class", "name svelte-1yphppm");
-    			add_location(div0, file$5, 38, 16, 1147);
+    			add_location(div0, file$5, 38, 16, 1146);
     			attr_dev(label, "class", "switch svelte-1yphppm");
-    			add_location(label, file$5, 34, 12, 962);
+    			add_location(label, file$5, 34, 12, 961);
     			attr_dev(div1, "class", "boolean svelte-1yphppm");
-    			add_location(div1, file$5, 33, 8, 927);
+    			add_location(div1, file$5, 33, 8, 926);
     			attr_dev(div2, "class", "head");
-    			add_location(div2, file$5, 32, 4, 899);
+    			add_location(div2, file$5, 32, 4, 898);
     			attr_dev(div3, "class", "setting");
-    			add_location(div3, file$5, 31, 0, 872);
+    			add_location(div3, file$5, 31, 0, 871);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1724,7 +1736,7 @@ var app = (function () {
 
     	$$self.$capture_state = () => ({
     		sineInOut,
-    		slide,
+    		fade,
     		GenericSetting,
     		instance,
     		hiddenSettings,
@@ -2169,7 +2181,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "values svelte-4eh9eh");
-    			add_location(div, file$3, 42, 8, 1313);
+    			add_location(div, file$3, 42, 8, 1319);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2263,7 +2275,7 @@ var app = (function () {
     			t = text(t_value);
     			attr_dev(div, "class", "value svelte-4eh9eh");
     			toggle_class(div, "enabled", /*v*/ ctx[14] === /*value*/ ctx[0]);
-    			add_location(div, file$3, 44, 16, 1444);
+    			add_location(div, file$3, 44, 16, 1450);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2325,7 +2337,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "settings svelte-4eh9eh");
-    			add_location(div, file$3, 50, 8, 1629);
+    			add_location(div, file$3, 50, 8, 1635);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2376,7 +2388,7 @@ var app = (function () {
 
     			if (local) {
     				add_render_callback(() => {
-    					if (!div_transition) div_transition = create_bidirectional_transition(div, slide, { duration: 400, easing: sineInOut }, true);
+    					if (!div_transition) div_transition = create_bidirectional_transition(div, fade, { duration: 200, easing: sineInOut }, true);
     					div_transition.run(1);
     				});
     			}
@@ -2391,7 +2403,7 @@ var app = (function () {
     			}
 
     			if (local) {
-    				if (!div_transition) div_transition = create_bidirectional_transition(div, slide, { duration: 400, easing: sineInOut }, false);
+    				if (!div_transition) div_transition = create_bidirectional_transition(div, fade, { duration: 200, easing: sineInOut }, false);
     				div_transition.run(0);
     			}
 
@@ -2490,9 +2502,9 @@ var app = (function () {
     			if (if_block1) if_block1.c();
     			attr_dev(div0, "class", "name svelte-4eh9eh");
     			toggle_class(div0, "expanded", /*expanded*/ ctx[2]);
-    			add_location(div0, file$3, 40, 4, 1187);
+    			add_location(div0, file$3, 40, 4, 1193);
     			attr_dev(div1, "class", "setting svelte-4eh9eh");
-    			add_location(div1, file$3, 39, 0, 1160);
+    			add_location(div1, file$3, 39, 0, 1166);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2647,6 +2659,7 @@ var app = (function () {
 
     	$$self.$capture_state = () => ({
     		sineInOut,
+    		fade,
     		slide,
     		GenericSetting,
     		instance,
@@ -2718,9 +2731,7 @@ var app = (function () {
 
     /* src\clickgui\settings\GenericSetting.svelte generated by Svelte v3.35.0 */
 
-    const { console: console_1$2 } = globals;
-
-    // (26:26) 
+    // (25:26) 
     function create_if_block_5(ctx) {
     	let textsetting;
     	let current;
@@ -2761,14 +2772,14 @@ var app = (function () {
     		block,
     		id: create_if_block_5.name,
     		type: "if",
-    		source: "(26:26) ",
+    		source: "(25:26) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (24:28) 
+    // (23:28) 
     function create_if_block_4(ctx) {
     	let choicesetting;
     	let current;
@@ -2809,14 +2820,14 @@ var app = (function () {
     		block,
     		id: create_if_block_4.name,
     		type: "if",
-    		source: "(24:28) ",
+    		source: "(23:28) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (22:95) 
+    // (21:95) 
     function create_if_block_3(ctx) {
     	let rangesetting;
     	let current;
@@ -2857,14 +2868,14 @@ var app = (function () {
     		block,
     		id: create_if_block_3.name,
     		type: "if",
-    		source: "(22:95) ",
+    		source: "(21:95) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (20:32) 
+    // (19:32) 
     function create_if_block_2(ctx) {
     	let togglablesetting;
     	let current;
@@ -2905,14 +2916,14 @@ var app = (function () {
     		block,
     		id: create_if_block_2.name,
     		type: "if",
-    		source: "(20:32) ",
+    		source: "(19:32) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (18:28) 
+    // (17:28) 
     function create_if_block_1(ctx) {
     	let choosesetting;
     	let current;
@@ -2953,14 +2964,14 @@ var app = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(18:28) ",
+    		source: "(17:28) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (16:0) {#if type === "BOOLEAN"}
+    // (15:0) {#if type === "BOOLEAN"}
     function create_if_block$2(ctx) {
     	let booleansetting;
     	let current;
@@ -3001,7 +3012,7 @@ var app = (function () {
     		block,
     		id: create_if_block$2.name,
     		type: "if",
-    		source: "(16:0) {#if type === \\\"BOOLEAN\\\"}",
+    		source: "(15:0) {#if type === \\\"BOOLEAN\\\"}",
     		ctx
     	});
 
@@ -3092,11 +3103,10 @@ var app = (function () {
     	validate_slots("GenericSetting", slots, []);
     	let { instance } = $$props;
     	let type = instance.getValueType().toString();
-    	console.log(instance);
     	const writable_props = ["instance"];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console_1$2.warn(`<GenericSetting> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<GenericSetting> was created with unknown prop '${key}'`);
     	});
 
     	$$self.$$set = $$props => {
@@ -3143,7 +3153,7 @@ var app = (function () {
     		const props = options.props || {};
 
     		if (/*instance*/ ctx[0] === undefined && !("instance" in props)) {
-    			console_1$2.warn("<GenericSetting> was created without expected prop 'instance'");
+    			console.warn("<GenericSetting> was created without expected prop 'instance'");
     		}
     	}
 
@@ -4002,7 +4012,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "clickgui-container svelte-1fiwon3");
-    			add_location(div, file, 29, 8, 729);
+    			add_location(div, file, 29, 8, 741);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -4133,7 +4143,7 @@ var app = (function () {
     		c: function create() {
     			main = element("main");
     			if (if_block) if_block.c();
-    			add_location(main, file, 27, 0, 687);
+    			add_location(main, file, 27, 0, 699);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4176,7 +4186,7 @@ var app = (function () {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("ClickGui", slots, []);
     	let clickGuiOpened = true;
-    	const categories = ["Combat", "Render", "Misc"];
+    	const categories = ["Combat", "Render", "Misc", "Movement"];
     	const modules = [];
 
     	try {

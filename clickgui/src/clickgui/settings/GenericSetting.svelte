@@ -10,7 +10,6 @@
     export let instance;
 
     let type = instance.getValueType().toString();
-    console.log(instance);
 </script>
 
 {#if type === "BOOLEAN"}
