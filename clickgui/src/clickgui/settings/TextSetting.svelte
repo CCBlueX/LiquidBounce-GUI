@@ -1,11 +1,17 @@
 <script>
-    export let name;
-    export let value;
+    export let instance;
+
+    let name = instance.getName();
+    let value = instance.get();
+
+    function handleTextChange(e) {
+        instance.set(value);
+    }
 </script>
 
 <div class="setting">
     <div class="name">{name}</div>
-    <input type="text" placeholder={name} {value} />
+    <input type="text" bind:value={value} on:change={handleTextChange} placeholder={name} />
 </div>
 
 <style>

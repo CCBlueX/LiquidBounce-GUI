@@ -1,15 +1,22 @@
 <script>
     import { onMount } from "svelte";
 
-    export let name;
-    export let min;
-    export let max;
-    export let step;
-    export let getValue;
-    export let setValue;
+    export let instance;
 
-    let value = getValue();
-    let multi = false;
+    let type = instance.getValueType().toString();
+
+    let name = instance.getName();
+    let min = instance.getRange().getStart()
+    let max = instance.getRange().getEndInclusive()
+    let step = type.includes("INT") ? 1 : 0.1;
+    let multi = type.includes("RANGE");
+
+    let value;
+    if (multi) {
+        value = [instance.get().getStart(), instance.get().getEndInclusive()];
+    } else {
+        value = [instance.get()];
+    }
 
     let valueString;
     function updateValueString() {
@@ -19,13 +26,10 @@
             valueString = value[0].toString();
         }
     }
+    updateValueString();
 
     let slider = null;
     onMount(() => {
-        console.log(getValue());
-        multi = value.length > 1;
-        updateValueString();
-
         const start = value;
         let connect = "lower";
         if (multi) {
@@ -44,10 +48,21 @@
         });
 
         slider.noUiSlider.on("update", values => {
-            value = values.map(parseFloat);
-            setValue[0](value[0]);
+            value = values.map(v => parseFloat(v));
+
+            if (type.includes("INT")) {
+                value[0] |= 0;
+                value[1] |= 0;
+            }
+
             if (multi) {
-                setValue[1](value[1]);
+                if (type.includes("FLOAT")) {
+                    instance.set(kotlin.floatRange(value[0], value[1]));
+                } else {
+                    instance.set(kotlin.intRange(value[0], value[1]));
+                }
+            } else {
+                instance.set(value[0]);
             }
 
             updateValueString();

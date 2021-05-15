@@ -2,9 +2,11 @@
     import { sineInOut } from "svelte/easing";
     import { slide } from "svelte/transition";
 
-    export let name;
-    export let values;
-    export let value;
+    export let instance;
+
+    let name = instance.getName();
+    let values = instance.getChoicesStrings();
+    let value = instance.get().getChoiceName();
 
     let expanded = false;
 
@@ -14,6 +16,7 @@
 
     function handleValueChange(v) {
         value = v;
+        instance.setFromValueName(v);
     }
 </script>
 
@@ -22,7 +25,7 @@
     {#if expanded}
         <div class="values" transition:slide|local={{duration: 200, easing: sineInOut}}>
             {#each values as v}
-                <div class="value" on:click={handleValueChange(v)} class:enabled={v === value}>{v}</div>
+                <div class="value" on:click={() => handleValueChange(v)} class:enabled={v === value}>{v}</div>
             {/each}
         </div>
     {/if}
@@ -71,6 +74,7 @@
     .values {
         background-color: rgba(0, 0, 0, 0.5);
         border-radius: 0px 0px 5px 5px;
+        overflow: hidden;
     }
 
     .values .value {

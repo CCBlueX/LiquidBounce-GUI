@@ -3,7 +3,7 @@
 
     let clickGuiOpened = true;
 
-    const categories = ["Combat", "Render"];
+    const categories = ["Combat", "Render", "Misc"];
     const modules = [];
     
     try {
@@ -12,11 +12,8 @@
         while (moduleIterator.hasNext()) {
             const m = moduleIterator.next();
             modules.push({
-                name: m.getName(),
                 category: m.getCategory().getReadableName(),
-                enabled: m.getEnabled(),
-                setEnabled: m.setEnabled,
-                settings: valueParser.parse(m.getContainedSettingsRecursively())
+                instance: m
             });
         }
     } catch (err) {

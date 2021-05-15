@@ -1,22 +1,15 @@
 <script>
-    import { onMount } from "svelte";
+    export let instance;
 
-    export let name;
-    export let getValue;
-    export let setValue;
-
-    let value = getValue();
-
-    onMount(() => {
-        value = getValue();
-    });
+    let name = instance.getName();
+    let value = instance.get();
 
     function handleValueChange() {
-        setValue(value);
+        instance.set(value);
     }
 </script>
 
-<div class="setting boolean">
+<div class="setting">
     <label class="switch">
         <input type="checkbox" bind:checked={value} on:change={handleValueChange} />
         <span class="slider" />

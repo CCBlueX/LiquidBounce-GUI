@@ -2,27 +2,41 @@
     import { sineInOut } from "svelte/easing";
     import { slide } from "svelte/transition";
 
-    import BooleanSetting from "./settings/BooleanSetting.svelte";
-    import RangeSetting from "./settings/RangeSetting.svelte";
-    import ListSetting from "./settings/ListSetting.svelte";
-    import ColorSetting from "./settings/ColorSetting.svelte";
-    import TextSetting from "./settings/TextSetting.svelte";
-    import TogglableSetting from "./settings/TogglableSetting.svelte";
+    import GenericSetting from "./settings/GenericSetting.svelte";
 
-    export let name;
-    export let enabled;
-    export let settings;
-    export let setEnabled;
+    export let instance;
+
+    let name = instance.getName();
+    let enabled = instance.getEnabled();
+
+    const hiddenSettings = ["Enabled", "Hidden", "Bind"];
+
+    function toJavaScriptArray(a) {
+        const v = [];
+        for (let i = 0; i < a.length; i++) {
+            if (!hiddenSettings.includes(a[i].getName())) {
+                v.push(a[i]);
+            }
+        }
+
+        return v;
+    }
+
+    let settings = toJavaScriptArray(instance.getContainedSettingsRecursively());
 
     let expanded = false;
 
     function handleToggle(e) {
-        setEnabled(!enabled);
+        instance.setEnabled(!enabled);
     }
 
     function handleToggleSettings(event) {
         if (event.button === 2) {
             expanded = !expanded;
+
+            if (expanded) {
+                settings = toJavaScriptArray(instance.getContainedSettingsRecursively());
+            }
         }  
     }
 </script>
@@ -32,19 +46,7 @@
     {#if expanded}
         <div class="settings" transition:slide={{duration: 400, easing: sineInOut}}>
             {#each settings as s}
-                {#if s.type === "boolean"}
-                    <BooleanSetting {...s} />
-                {:else if s.type === "range"}
-                    <RangeSetting {...s} />
-                {:else if s.type === "list"}
-                    <ListSetting {...s} />
-                {:else if s.type === "color"}
-                    <ColorSetting {...s} />
-                {:else if s.type === "text"}
-                    <TextSetting {...s} />
-                {:else if s.type === "togglable"}
-                    <TogglableSetting {...s} />
-                {/if}
+                <GenericSetting instance={s} />
             {/each}
         </div>
     {/if}

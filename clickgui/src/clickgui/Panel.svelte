@@ -80,7 +80,7 @@
     <div class="modules">
         {#each renderedModules as m}
             <div transition:slide={{duration: 400, easing: sineInOut}}>
-                <Module name={m.name} enabled={m.enabled} settings={m.settings} setEnabled={m.setEnabled} />
+                <Module instance={m.instance} />
             </div>
         {/each}
     </div>
