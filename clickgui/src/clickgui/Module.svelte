@@ -22,7 +22,7 @@
         return v;
     }
 
-    let settings = toJavaScriptArray(instance.getContainedSettingsRecursively());
+    let settings = toJavaScriptArray(instance.getContainedValues());
 
     let expanded = false;
 
@@ -35,7 +35,7 @@
             expanded = !expanded;
 
             if (expanded) {
-                settings = toJavaScriptArray(instance.getContainedSettingsRecursively());
+                settings = toJavaScriptArray(instance.getContainedValues());
             }
         }  
     }

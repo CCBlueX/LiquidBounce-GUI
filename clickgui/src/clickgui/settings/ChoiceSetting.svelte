@@ -20,20 +20,23 @@
 
     let name = instance.getName();
     let values = instance.getChoicesStrings();
-    let value = instance.getActive();
-    let settings = toJavaScriptArray(instance.getActiveChoice().getContainedSettingsRecursively());
+    let value = instance.getActiveChoice().getChoiceName();
+    let settings = toJavaScriptArray(instance.getActiveChoice().getContainedValues());
 
     let expanded = false;
 
     function handleToggleExpand() {
         expanded = !expanded;
-        settings = toJavaScriptArray(instance.getActiveChoice().getContainedSettingsRecursively());
+
+        if (expanded) {
+            settings = toJavaScriptArray(instance.getActiveChoice().getContainedValues());
+        }
     }
 
     function handleValueChange(v) {
         value = v;
         instance.setFromValueName(v);
-        settings = toJavaScriptArray(instance.getActiveChoice().getContainedSettingsRecursively());
+        settings = toJavaScriptArray(instance.getActiveChoice().getContainedValues());
     }
 </script>
 

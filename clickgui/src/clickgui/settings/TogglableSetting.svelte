@@ -21,11 +21,11 @@
     let value = instance.getEnabledValue().get();
     let name = instance.getName();
 
-    let settings = toJavaScriptArray(instance.getContainedSettingsRecursively());
+    let settings = toJavaScriptArray(instance.getContainedValues());
 
     function setTogglableValue(e) {
         instance.getEnabledValue().set(value);
-        settings = toJavaScriptArray(instance.getContainedSettingsRecursively());
+        settings = toJavaScriptArray(instance.getContainedValues());
     }
 </script>
 
