@@ -52,7 +52,8 @@
     window.addEventListener("mousemove", onMouseMove);
 
     function handleToggleModule(event) {
-        modules.find(m => m.name === event.getModule().getName()).enabled = event.getNewState();
+        const targetModule = event.getModule().getName();
+        modules.find(m => m.name === targetModule).enabled = event.getNewState();
         if (expanded) {
             renderedModules = modules;
         }
@@ -80,7 +81,7 @@
     <div class="modules">
         {#each renderedModules as m}
             <div transition:slide={{duration: 400, easing: sineInOut}}>
-                <Module instance={m.instance} />
+                <Module instance={m.instance} enabled={m.enabled} />
             </div>
         {/each}
     </div>

@@ -3180,7 +3180,7 @@ var app = (function () {
     	let div;
     	let div_transition;
     	let current;
-    	let each_value = /*settings*/ ctx[0];
+    	let each_value = /*settings*/ ctx[1];
     	validate_each_argument(each_value);
     	let each_blocks = [];
 
@@ -3201,7 +3201,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "settings svelte-xunng5");
-    			add_location(div, file$2, 46, 8, 1304);
+    			add_location(div, file$2, 46, 8, 1287);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -3215,8 +3215,8 @@ var app = (function () {
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
 
-    			if (dirty & /*settings*/ 1) {
-    				each_value = /*settings*/ ctx[0];
+    			if (dirty & /*settings*/ 2) {
+    				each_value = /*settings*/ ctx[1];
     				validate_each_argument(each_value);
     				let i;
 
@@ -3306,7 +3306,7 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const genericsetting_changes = {};
-    			if (dirty & /*settings*/ 1) genericsetting_changes.instance = /*s*/ ctx[9];
+    			if (dirty & /*settings*/ 2) genericsetting_changes.instance = /*s*/ ctx[9];
     			genericsetting.$set(genericsetting_changes);
     		},
     		i: function intro(local) {
@@ -3341,21 +3341,21 @@ var app = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	let if_block = /*expanded*/ ctx[1] && create_if_block$1(ctx);
+    	let if_block = /*expanded*/ ctx[2] && create_if_block$1(ctx);
 
     	const block = {
     		c: function create() {
     			div1 = element("div");
     			div0 = element("div");
-    			div0.textContent = `${/*name*/ ctx[2]}`;
+    			div0.textContent = `${/*name*/ ctx[3]}`;
     			t1 = space();
     			if (if_block) if_block.c();
     			attr_dev(div0, "class", "module svelte-xunng5");
-    			toggle_class(div0, "has-settings", /*settings*/ ctx[0].length > 0);
-    			toggle_class(div0, "enabled", /*enabled*/ ctx[3]);
-    			toggle_class(div0, "expanded", /*expanded*/ ctx[1]);
-    			add_location(div0, file$2, 44, 4, 1091);
-    			add_location(div1, file$2, 43, 0, 1080);
+    			toggle_class(div0, "has-settings", /*settings*/ ctx[1].length > 0);
+    			toggle_class(div0, "enabled", /*enabled*/ ctx[0]);
+    			toggle_class(div0, "expanded", /*expanded*/ ctx[2]);
+    			add_location(div0, file$2, 44, 4, 1074);
+    			add_location(div1, file$2, 43, 0, 1063);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3377,19 +3377,23 @@ var app = (function () {
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			if (dirty & /*settings*/ 1) {
-    				toggle_class(div0, "has-settings", /*settings*/ ctx[0].length > 0);
+    			if (dirty & /*settings*/ 2) {
+    				toggle_class(div0, "has-settings", /*settings*/ ctx[1].length > 0);
     			}
 
-    			if (dirty & /*expanded*/ 2) {
-    				toggle_class(div0, "expanded", /*expanded*/ ctx[1]);
+    			if (dirty & /*enabled*/ 1) {
+    				toggle_class(div0, "enabled", /*enabled*/ ctx[0]);
     			}
 
-    			if (/*expanded*/ ctx[1]) {
+    			if (dirty & /*expanded*/ 4) {
+    				toggle_class(div0, "expanded", /*expanded*/ ctx[2]);
+    			}
+
+    			if (/*expanded*/ ctx[2]) {
     				if (if_block) {
     					if_block.p(ctx, dirty);
 
-    					if (dirty & /*expanded*/ 2) {
+    					if (dirty & /*expanded*/ 4) {
     						transition_in(if_block, 1);
     					}
     				} else {
@@ -3440,8 +3444,8 @@ var app = (function () {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Module", slots, []);
     	let { instance } = $$props;
+    	let { enabled } = $$props;
     	let name = instance.getName();
-    	let enabled = instance.getEnabled();
     	const hiddenSettings = ["Enabled", "Hidden", "Bind"];
 
     	function toJavaScriptArray(a) {
@@ -3465,15 +3469,15 @@ var app = (function () {
 
     	function handleToggleSettings(event) {
     		if (event.button === 2) {
-    			$$invalidate(1, expanded = !expanded);
+    			$$invalidate(2, expanded = !expanded);
 
     			if (expanded) {
-    				$$invalidate(0, settings = toJavaScriptArray(instance.getContainedSettingsRecursively()));
+    				$$invalidate(1, settings = toJavaScriptArray(instance.getContainedSettingsRecursively()));
     			}
     		}
     	}
 
-    	const writable_props = ["instance"];
+    	const writable_props = ["instance", "enabled"];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Module> was created with unknown prop '${key}'`);
@@ -3481,6 +3485,7 @@ var app = (function () {
 
     	$$self.$$set = $$props => {
     		if ("instance" in $$props) $$invalidate(6, instance = $$props.instance);
+    		if ("enabled" in $$props) $$invalidate(0, enabled = $$props.enabled);
     	};
 
     	$$self.$capture_state = () => ({
@@ -3488,8 +3493,8 @@ var app = (function () {
     		slide,
     		GenericSetting,
     		instance,
-    		name,
     		enabled,
+    		name,
     		hiddenSettings,
     		toJavaScriptArray,
     		settings,
@@ -3500,10 +3505,10 @@ var app = (function () {
 
     	$$self.$inject_state = $$props => {
     		if ("instance" in $$props) $$invalidate(6, instance = $$props.instance);
-    		if ("name" in $$props) $$invalidate(2, name = $$props.name);
-    		if ("enabled" in $$props) $$invalidate(3, enabled = $$props.enabled);
-    		if ("settings" in $$props) $$invalidate(0, settings = $$props.settings);
-    		if ("expanded" in $$props) $$invalidate(1, expanded = $$props.expanded);
+    		if ("enabled" in $$props) $$invalidate(0, enabled = $$props.enabled);
+    		if ("name" in $$props) $$invalidate(3, name = $$props.name);
+    		if ("settings" in $$props) $$invalidate(1, settings = $$props.settings);
+    		if ("expanded" in $$props) $$invalidate(2, expanded = $$props.expanded);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -3511,10 +3516,10 @@ var app = (function () {
     	}
 
     	return [
+    		enabled,
     		settings,
     		expanded,
     		name,
-    		enabled,
     		handleToggle,
     		handleToggleSettings,
     		instance
@@ -3524,7 +3529,7 @@ var app = (function () {
     class Module extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance_1, create_fragment$2, safe_not_equal, { instance: 6 });
+    		init(this, options, instance_1, create_fragment$2, safe_not_equal, { instance: 6, enabled: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
@@ -3539,6 +3544,10 @@ var app = (function () {
     		if (/*instance*/ ctx[6] === undefined && !("instance" in props)) {
     			console.warn("<Module> was created without expected prop 'instance'");
     		}
+
+    		if (/*enabled*/ ctx[0] === undefined && !("enabled" in props)) {
+    			console.warn("<Module> was created without expected prop 'enabled'");
+    		}
     	}
 
     	get instance() {
@@ -3546,6 +3555,14 @@ var app = (function () {
     	}
 
     	set instance(value) {
+    		throw new Error("<Module>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get enabled() {
+    		throw new Error("<Module>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set enabled(value) {
     		throw new Error("<Module>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
@@ -3561,7 +3578,7 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (81:8) {#each renderedModules as m}
+    // (82:8) {#each renderedModules as m}
     function create_each_block$1(ctx) {
     	let div;
     	let module;
@@ -3570,7 +3587,10 @@ var app = (function () {
     	let current;
 
     	module = new Module({
-    			props: { instance: /*m*/ ctx[15].instance },
+    			props: {
+    				instance: /*m*/ ctx[15].instance,
+    				enabled: /*m*/ ctx[15].enabled
+    			},
     			$$inline: true
     		});
 
@@ -3580,7 +3600,7 @@ var app = (function () {
     			create_component(module.$$.fragment);
     			t = space();
     			attr_dev(div, "class", "svelte-3om7h4");
-    			add_location(div, file$1, 81, 12, 2454);
+    			add_location(div, file$1, 82, 12, 2498);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -3592,6 +3612,7 @@ var app = (function () {
     			ctx = new_ctx;
     			const module_changes = {};
     			if (dirty & /*renderedModules*/ 4) module_changes.instance = /*m*/ ctx[15].instance;
+    			if (dirty & /*renderedModules*/ 4) module_changes.enabled = /*m*/ ctx[15].enabled;
     			module.$set(module_changes);
     		},
     		i: function intro(local) {
@@ -3622,7 +3643,7 @@ var app = (function () {
     		block,
     		id: create_each_block$1.name,
     		type: "each",
-    		source: "(81:8) {#each renderedModules as m}",
+    		source: "(82:8) {#each renderedModules as m}",
     		ctx
     	});
 
@@ -3676,20 +3697,20 @@ var app = (function () {
     			attr_dev(img, "class", "icon svelte-3om7h4");
     			if (img.src !== (img_src_value = "img/" + /*category*/ ctx[0].toLowerCase() + ".svg")) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "icon");
-    			add_location(img, file$1, 75, 8, 2149);
+    			add_location(img, file$1, 76, 8, 2193);
     			attr_dev(div0, "class", "title svelte-3om7h4");
-    			add_location(div0, file$1, 76, 8, 2229);
+    			add_location(div0, file$1, 77, 8, 2273);
     			attr_dev(div1, "class", "visibility-toggle svelte-3om7h4");
     			toggle_class(div1, "expanded", /*expanded*/ ctx[1]);
-    			add_location(div1, file$1, 77, 8, 2274);
+    			add_location(div1, file$1, 78, 8, 2318);
     			attr_dev(div2, "class", "title-wrapper svelte-3om7h4");
-    			add_location(div2, file$1, 74, 4, 2052);
+    			add_location(div2, file$1, 75, 4, 2096);
     			attr_dev(div3, "class", "modules svelte-3om7h4");
-    			add_location(div3, file$1, 79, 4, 2381);
+    			add_location(div3, file$1, 80, 4, 2425);
     			attr_dev(div4, "class", "panel svelte-3om7h4");
     			set_style(div4, "left", /*left*/ ctx[4] + "px");
     			set_style(div4, "top", /*top*/ ctx[3] + "px");
-    			add_location(div4, file$1, 73, 0, 1989);
+    			add_location(div4, file$1, 74, 0, 2033);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3855,7 +3876,8 @@ var app = (function () {
     	window.addEventListener("mousemove", onMouseMove);
 
     	function handleToggleModule(event) {
-    		modules.find(m => m.name === event.getModule().getName()).enabled = event.getNewState();
+    		const targetModule = event.getModule().getName();
+    		modules.find(m => m.name === targetModule).enabled = event.getNewState();
 
     		if (expanded) {
     			$$invalidate(2, renderedModules = modules);
@@ -3987,7 +4009,7 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (29:4) {#if clickGuiOpened}
+    // (31:4) {#if clickGuiOpened}
     function create_if_block(ctx) {
     	let div;
     	let current;
@@ -4012,7 +4034,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "clickgui-container svelte-1fiwon3");
-    			add_location(div, file, 29, 8, 741);
+    			add_location(div, file, 31, 8, 819);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -4080,14 +4102,14 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(29:4) {#if clickGuiOpened}",
+    		source: "(31:4) {#if clickGuiOpened}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (31:12) {#each categories as category}
+    // (33:12) {#each categories as category}
     function create_each_block(ctx) {
     	let panel;
     	let current;
@@ -4127,7 +4149,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(31:12) {#each categories as category}",
+    		source: "(33:12) {#each categories as category}",
     		ctx
     	});
 
@@ -4143,7 +4165,7 @@ var app = (function () {
     		c: function create() {
     			main = element("main");
     			if (if_block) if_block.c();
-    			add_location(main, file, 27, 0, 699);
+    			add_location(main, file, 29, 0, 777);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4197,7 +4219,9 @@ var app = (function () {
 
     			modules.push({
     				category: m.getCategory().getReadableName(),
-    				instance: m
+    				name: m.getName(),
+    				instance: m,
+    				enabled: m.getEnabled()
     			});
     		}
     	} catch(err) {

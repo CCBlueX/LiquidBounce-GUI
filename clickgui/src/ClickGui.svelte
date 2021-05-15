@@ -13,7 +13,9 @@
             const m = moduleIterator.next();
             modules.push({
                 category: m.getCategory().getReadableName(),
-                instance: m
+                name: m.getName(),
+                instance: m,
+                enabled: m.getEnabled()
             });
         }
     } catch (err) {

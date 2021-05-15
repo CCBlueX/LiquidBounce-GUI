@@ -5,9 +5,9 @@
     import GenericSetting from "./settings/GenericSetting.svelte";
 
     export let instance;
+    export let enabled;
 
     let name = instance.getName();
-    let enabled = instance.getEnabled();
 
     const hiddenSettings = ["Enabled", "Hidden", "Bind"];
 
