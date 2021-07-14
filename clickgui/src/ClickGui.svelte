@@ -37,13 +37,16 @@
 </script>
 
 <main>
-    {#if clickGuiOpened}
-        <div class="clickgui-container">
-            {#each categories as category}
-                <Panel category={category} modules={getModulesOfCategory(category)} />
-            {/each}
-        </div>
-    {/if}
+    <div class="body">
+    
+        {#if clickGuiOpened}
+            <div class="clickgui-container">
+                {#each categories as category}
+                    <Panel category={category} modules={getModulesOfCategory(category)} />
+                {/each}
+            </div>
+        {/if}
+    </div>
 </main>
 
 <style>
@@ -56,7 +59,7 @@
         user-select: none; 
         cursor: default;
     }
-    body{
+    .body{
         overflow-y: hidden;
     }
 </style>
