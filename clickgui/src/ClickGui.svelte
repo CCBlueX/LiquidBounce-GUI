@@ -37,7 +37,6 @@
 </script>
 
 <main>
-    <div class="body">
     
         {#if clickGuiOpened}
             <div class="clickgui-container">
@@ -46,7 +45,6 @@
                 {/each}
             </div>
         {/if}
-    </div>
 </main>
 
 <style>
@@ -58,8 +56,6 @@
         -ms-user-select: none; 
         user-select: none; 
         cursor: default;
-    }
-    .body{
         overflow-y: hidden;
     }
 </style>
