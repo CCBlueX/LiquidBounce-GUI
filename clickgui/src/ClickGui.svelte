@@ -39,7 +39,7 @@
 <main>
     
         {#if clickGuiOpened}
-            <div class="clickgui-container">
+            <div>
                 {#each categories as category}
                     <Panel category={category} modules={getModulesOfCategory(category)} />
                 {/each}
@@ -48,14 +48,12 @@
 </main>
 
 <style>
-    .clickgui-container {
-        background-color: rgba(0, 0, 0, .4);
-        height: 100vh;
-        width: 100vw;
+    :global(body) {
+        margin: 0;
+		background-color: rgba(0,0,0,.4);
         -webkit-user-select: none;
         -ms-user-select: none; 
         user-select: none; 
         cursor: default;
-        overflow-y: hidden;
     }
 </style>
