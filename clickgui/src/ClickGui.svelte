@@ -56,4 +56,7 @@
         user-select: none; 
         cursor: default;
     }
+    body{
+        overflow-y: hidden;
+    }
 </style>
