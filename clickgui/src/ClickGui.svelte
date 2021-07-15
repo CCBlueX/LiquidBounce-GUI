@@ -14,7 +14,7 @@
         "Fun",
     ];
     const modules = [];
-    
+
     try {
         const moduleIterator = client.getModuleManager().iterator();
 
@@ -24,7 +24,7 @@
                 category: m.getCategory().getReadableName(),
                 name: m.getName(),
                 instance: m,
-                enabled: m.getEnabled()
+                enabled: m.getEnabled(),
             });
         }
     } catch (err) {
@@ -32,28 +32,41 @@
     }
 
     function getModulesOfCategory(category) {
-        return modules.filter(m => m.category === category);
+        return modules.filter((m) => m.category === category);
     }
+
+    var isMousePressed = false;
+    document.body.addEventListener("mousedown", function (e) {
+        isMousePressed = true;
+    });
+
+    window.addEventListener("mouseup", function (e) {
+        isMousePressed = false;
+    });
+    window.addEventListener("mousemove", function (e) {
+        if (isMousePressed) {
+            window.scrollBy(-e.movementX, -e.movementY);
+        }
+    });
 </script>
 
 <main>
-    
-        {#if clickGuiOpened}
-            <div>
-                {#each categories as category}
-                    <Panel category={category} modules={getModulesOfCategory(category)} />
-                {/each}
-            </div>
-        {/if}
+    {#if clickGuiOpened}
+        <div>
+            {#each categories as category}
+                <Panel {category} modules={getModulesOfCategory(category)} />
+            {/each}
+        </div>
+    {/if}
 </main>
 
 <style>
     :global(body) {
         margin: 0;
-		background-color: rgba(0,0,0,.4);
+        background-color: rgba(0, 0, 0, 0.4);
         -webkit-user-select: none;
-        -ms-user-select: none; 
-        user-select: none; 
+        -ms-user-select: none;
+        user-select: none;
         cursor: default;
     }
 </style>
