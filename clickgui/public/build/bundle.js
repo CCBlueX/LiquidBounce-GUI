@@ -1,5 +1,5 @@
 
-(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
+(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
 var app = (function () {
     'use strict';
 
@@ -64,119 +64,11 @@ var app = (function () {
         };
     }
 
-    // Track which nodes are claimed during hydration. Unclaimed nodes can then be removed from the DOM
-    // at the end of hydration without touching the remaining nodes.
-    let is_hydrating = false;
-    function start_hydrating() {
-        is_hydrating = true;
-    }
-    function end_hydrating() {
-        is_hydrating = false;
-    }
-    function upper_bound(low, high, key, value) {
-        // Return first index of value larger than input value in the range [low, high)
-        while (low < high) {
-            const mid = low + ((high - low) >> 1);
-            if (key(mid) <= value) {
-                low = mid + 1;
-            }
-            else {
-                high = mid;
-            }
-        }
-        return low;
-    }
-    function init_hydrate(target) {
-        if (target.hydrate_init)
-            return;
-        target.hydrate_init = true;
-        // We know that all children have claim_order values since the unclaimed have been detached
-        const children = target.childNodes;
-        /*
-        * Reorder claimed children optimally.
-        * We can reorder claimed children optimally by finding the longest subsequence of
-        * nodes that are already claimed in order and only moving the rest. The longest
-        * subsequence subsequence of nodes that are claimed in order can be found by
-        * computing the longest increasing subsequence of .claim_order values.
-        *
-        * This algorithm is optimal in generating the least amount of reorder operations
-        * possible.
-        *
-        * Proof:
-        * We know that, given a set of reordering operations, the nodes that do not move
-        * always form an increasing subsequence, since they do not move among each other
-        * meaning that they must be already ordered among each other. Thus, the maximal
-        * set of nodes that do not move form a longest increasing subsequence.
-        */
-        // Compute longest increasing subsequence
-        // m: subsequence length j => index k of smallest value that ends an increasing subsequence of length j
-        const m = new Int32Array(children.length + 1);
-        // Predecessor indices + 1
-        const p = new Int32Array(children.length);
-        m[0] = -1;
-        let longest = 0;
-        for (let i = 0; i < children.length; i++) {
-            const current = children[i].claim_order;
-            // Find the largest subsequence length such that it ends in a value less than our current value
-            // upper_bound returns first greater value, so we subtract one
-            const seqLen = upper_bound(1, longest + 1, idx => children[m[idx]].claim_order, current) - 1;
-            p[i] = m[seqLen] + 1;
-            const newLen = seqLen + 1;
-            // We can guarantee that current is the smallest value. Otherwise, we would have generated a longer sequence.
-            m[newLen] = i;
-            longest = Math.max(newLen, longest);
-        }
-        // The longest increasing subsequence of nodes (initially reversed)
-        const lis = [];
-        // The rest of the nodes, nodes that will be moved
-        const toMove = [];
-        let last = children.length - 1;
-        for (let cur = m[longest] + 1; cur != 0; cur = p[cur - 1]) {
-            lis.push(children[cur - 1]);
-            for (; last >= cur; last--) {
-                toMove.push(children[last]);
-            }
-            last--;
-        }
-        for (; last >= 0; last--) {
-            toMove.push(children[last]);
-        }
-        lis.reverse();
-        // We sort the nodes being moved to guarantee that their insertion order matches the claim order
-        toMove.sort((a, b) => a.claim_order - b.claim_order);
-        // Finally, we move the nodes
-        for (let i = 0, j = 0; i < toMove.length; i++) {
-            while (j < lis.length && toMove[i].claim_order >= lis[j].claim_order) {
-                j++;
-            }
-            const anchor = j < lis.length ? lis[j] : null;
-            target.insertBefore(toMove[i], anchor);
-        }
-    }
     function append(target, node) {
-        if (is_hydrating) {
-            init_hydrate(target);
-            if ((target.actual_end_child === undefined) || ((target.actual_end_child !== null) && (target.actual_end_child.parentElement !== target))) {
-                target.actual_end_child = target.firstChild;
-            }
-            if (node !== target.actual_end_child) {
-                target.insertBefore(node, target.actual_end_child);
-            }
-            else {
-                target.actual_end_child = node.nextSibling;
-            }
-        }
-        else if (node.parentNode !== target) {
-            target.appendChild(node);
-        }
+        target.appendChild(node);
     }
     function insert(target, node, anchor) {
-        if (is_hydrating && !anchor) {
-            append(target, node);
-        }
-        else if (node.parentNode !== target || (anchor && node.nextSibling !== anchor)) {
-            target.insertBefore(node, anchor || null);
-        }
+        target.insertBefore(node, anchor || null);
     }
     function detach(node) {
         node.parentNode.removeChild(node);
@@ -612,7 +504,6 @@ var app = (function () {
         $$.fragment = create_fragment ? create_fragment($$.ctx) : false;
         if (options.target) {
             if (options.hydrate) {
-                start_hydrating();
                 const nodes = children(options.target);
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 $$.fragment && $$.fragment.l(nodes);
@@ -625,7 +516,6 @@ var app = (function () {
             if (options.intro)
                 transition_in(component.$$.fragment);
             mount_component(component, options.target, options.anchor, options.customElement);
-            end_hydrating();
             flush();
         }
         set_current_component(parent_component);
@@ -657,7 +547,7 @@ var app = (function () {
     }
 
     function dispatch_dev(type, detail) {
-        document.dispatchEvent(custom_event(type, Object.assign({ version: '3.38.3' }, detail)));
+        document.dispatchEvent(custom_event(type, Object.assign({ version: '3.37.0' }, detail)));
     }
     function append_dev(target, node) {
         dispatch_dev('SvelteDOMInsert', { target, node });
@@ -781,7 +671,7 @@ var app = (function () {
         };
     }
 
-    /* src\clickgui\settings\BooleanSetting.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\settings\BooleanSetting.svelte generated by Svelte v3.37.0 */
 
     const file$9 = "src\\clickgui\\settings\\BooleanSetting.svelte";
 
@@ -808,15 +698,15 @@ var app = (function () {
     			div0.textContent = `${/*name*/ ctx[1]}`;
     			attr_dev(input, "type", "checkbox");
     			attr_dev(input, "class", "svelte-1ijpkgb");
-    			add_location(input, file$9, 13, 8, 241);
+    			add_location(input, file$9, 13, 8, 254);
     			attr_dev(span, "class", "slider svelte-1ijpkgb");
-    			add_location(span, file$9, 14, 8, 326);
+    			add_location(span, file$9, 14, 8, 340);
     			attr_dev(div0, "class", "name svelte-1ijpkgb");
-    			add_location(div0, file$9, 16, 8, 359);
+    			add_location(div0, file$9, 16, 8, 375);
     			attr_dev(label, "class", "switch svelte-1ijpkgb");
-    			add_location(label, file$9, 12, 4, 210);
+    			add_location(label, file$9, 12, 4, 222);
     			attr_dev(div1, "class", "setting svelte-1ijpkgb");
-    			add_location(div1, file$9, 11, 0, 184);
+    			add_location(div1, file$9, 11, 0, 195);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -935,7 +825,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\settings\ColorSetting.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\settings\ColorSetting.svelte generated by Svelte v3.37.0 */
     const file$8 = "src\\clickgui\\settings\\ColorSetting.svelte";
 
     function create_fragment$9(ctx) {
@@ -961,15 +851,15 @@ var app = (function () {
     			div2 = element("div");
     			div1 = element("div");
     			attr_dev(div0, "class", "name svelte-1u9hj");
-    			add_location(div0, file$8, 50, 4, 1150);
+    			add_location(div0, file$8, 50, 4, 1200);
     			attr_dev(input, "class", "value svelte-1u9hj");
     			input.value = /*value*/ ctx[0];
-    			add_location(input, file$8, 51, 4, 1185);
-    			add_location(div1, file$8, 53, 8, 1297);
+    			add_location(input, file$8, 51, 4, 1236);
+    			add_location(div1, file$8, 53, 8, 1350);
     			attr_dev(div2, "class", "animation-fix color-picker svelte-1u9hj");
-    			add_location(div2, file$8, 52, 4, 1248);
+    			add_location(div2, file$8, 52, 4, 1300);
     			attr_dev(div3, "class", "setting svelte-1u9hj");
-    			add_location(div3, file$8, 49, 0, 1124);
+    			add_location(div3, file$8, 49, 0, 1173);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1144,7 +1034,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\settings\RangeSetting.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\settings\RangeSetting.svelte generated by Svelte v3.37.0 */
     const file$7 = "src\\clickgui\\settings\\RangeSetting.svelte";
 
     function create_fragment$8(ctx) {
@@ -1167,13 +1057,13 @@ var app = (function () {
     			t3 = space();
     			div2 = element("div");
     			attr_dev(div0, "class", "name svelte-fz8b1a");
-    			add_location(div0, file$7, 73, 4, 1815);
+    			add_location(div0, file$7, 73, 4, 1888);
     			attr_dev(div1, "class", "value svelte-fz8b1a");
-    			add_location(div1, file$7, 74, 4, 1850);
+    			add_location(div1, file$7, 74, 4, 1924);
     			attr_dev(div2, "class", "slider svelte-fz8b1a");
-    			add_location(div2, file$7, 75, 4, 1893);
+    			add_location(div2, file$7, 75, 4, 1968);
     			attr_dev(div3, "class", "setting animation-fix svelte-fz8b1a");
-    			add_location(div3, file$7, 72, 0, 1775);
+    			add_location(div3, file$7, 72, 0, 1847);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1360,7 +1250,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\settings\TextSetting.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\settings\TextSetting.svelte generated by Svelte v3.37.0 */
 
     const file$6 = "src\\clickgui\\settings\\TextSetting.svelte";
 
@@ -1380,13 +1270,13 @@ var app = (function () {
     			t1 = space();
     			input = element("input");
     			attr_dev(div0, "class", "name svelte-1qjr5n4");
-    			add_location(div0, file$6, 12, 4, 210);
+    			add_location(div0, file$6, 12, 4, 222);
     			attr_dev(input, "type", "text");
     			attr_dev(input, "placeholder", /*name*/ ctx[1]);
     			attr_dev(input, "class", "svelte-1qjr5n4");
-    			add_location(input, file$6, 13, 4, 245);
+    			add_location(input, file$6, 13, 4, 258);
     			attr_dev(div1, "class", "setting svelte-1qjr5n4");
-    			add_location(div1, file$6, 11, 0, 184);
+    			add_location(div1, file$6, 11, 0, 195);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1502,7 +1392,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\settings\TogglableSetting.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\settings\TogglableSetting.svelte generated by Svelte v3.37.0 */
     const file$5 = "src\\clickgui\\settings\\TogglableSetting.svelte";
 
     function get_each_context$5(ctx, list, i) {
@@ -1537,7 +1427,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "settings svelte-1yphppm");
-    			add_location(div, file$5, 44, 8, 1185);
+    			add_location(div, file$5, 44, 8, 1229);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -1705,19 +1595,19 @@ var app = (function () {
     			if (if_block) if_block.c();
     			attr_dev(input, "type", "checkbox");
     			attr_dev(input, "class", "svelte-1yphppm");
-    			add_location(input, file$5, 35, 16, 940);
+    			add_location(input, file$5, 35, 16, 975);
     			attr_dev(span, "class", "slider svelte-1yphppm");
-    			add_location(span, file$5, 36, 16, 1033);
+    			add_location(span, file$5, 36, 16, 1069);
     			attr_dev(div0, "class", "name svelte-1yphppm");
-    			add_location(div0, file$5, 38, 16, 1082);
+    			add_location(div0, file$5, 38, 16, 1120);
     			attr_dev(label, "class", "switch svelte-1yphppm");
-    			add_location(label, file$5, 34, 12, 901);
+    			add_location(label, file$5, 34, 12, 935);
     			attr_dev(div1, "class", "boolean svelte-1yphppm");
-    			add_location(div1, file$5, 33, 8, 867);
+    			add_location(div1, file$5, 33, 8, 900);
     			attr_dev(div2, "class", "head");
-    			add_location(div2, file$5, 32, 4, 840);
+    			add_location(div2, file$5, 32, 4, 872);
     			attr_dev(div3, "class", "setting");
-    			add_location(div3, file$5, 31, 0, 814);
+    			add_location(div3, file$5, 31, 0, 845);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1900,7 +1790,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\settings\ChooseSetting.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\settings\ChooseSetting.svelte generated by Svelte v3.37.0 */
     const file$4 = "src\\clickgui\\settings\\ChooseSetting.svelte";
 
     function get_each_context$4(ctx, list, i) {
@@ -1931,7 +1821,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "values svelte-1ek9iag");
-    			add_location(div, file$4, 25, 8, 621);
+    			add_location(div, file$4, 25, 8, 646);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2025,7 +1915,7 @@ var app = (function () {
     			t = text(t_value);
     			attr_dev(div, "class", "value svelte-1ek9iag");
     			toggle_class(div, "enabled", /*v*/ ctx[8] === /*value*/ ctx[0]);
-    			add_location(div, file$4, 27, 16, 750);
+    			add_location(div, file$4, 27, 16, 777);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2083,9 +1973,9 @@ var app = (function () {
     			if (if_block) if_block.c();
     			attr_dev(div0, "class", "name svelte-1ek9iag");
     			toggle_class(div0, "expanded", /*expanded*/ ctx[1]);
-    			add_location(div0, file$4, 23, 4, 497);
+    			add_location(div0, file$4, 23, 4, 520);
     			attr_dev(div1, "class", "setting svelte-1ek9iag");
-    			add_location(div1, file$4, 22, 0, 471);
+    			add_location(div1, file$4, 22, 0, 493);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2254,7 +2144,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\settings\ChoiceSetting.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\settings\ChoiceSetting.svelte generated by Svelte v3.37.0 */
     const file$3 = "src\\clickgui\\settings\\ChoiceSetting.svelte";
 
     function get_each_context$3(ctx, list, i) {
@@ -2291,7 +2181,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "values svelte-hvdsou");
-    			add_location(div, file$3, 46, 12, 1336);
+    			add_location(div, file$3, 46, 12, 1382);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2385,7 +2275,7 @@ var app = (function () {
     			t = text(t_value);
     			attr_dev(div, "class", "value svelte-hvdsou");
     			toggle_class(div, "enabled", /*v*/ ctx[14] === /*value*/ ctx[0]);
-    			add_location(div, file$3, 48, 20, 1473);
+    			add_location(div, file$3, 48, 20, 1521);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2447,7 +2337,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "settings svelte-hvdsou");
-    			add_location(div, file$3, 55, 8, 1675);
+    			add_location(div, file$3, 55, 8, 1730);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2614,11 +2504,11 @@ var app = (function () {
     			if (if_block1) if_block1.c();
     			attr_dev(div0, "class", "name svelte-hvdsou");
     			toggle_class(div0, "expanded", /*expanded*/ ctx[2]);
-    			add_location(div0, file$3, 44, 8, 1204);
+    			add_location(div0, file$3, 44, 8, 1248);
     			attr_dev(div1, "class", "choice svelte-hvdsou");
-    			add_location(div1, file$3, 43, 4, 1175);
+    			add_location(div1, file$3, 43, 4, 1218);
     			attr_dev(div2, "class", "setting svelte-hvdsou");
-    			add_location(div2, file$3, 42, 0, 1149);
+    			add_location(div2, file$3, 42, 0, 1191);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2847,7 +2737,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\settings\GenericSetting.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\settings\GenericSetting.svelte generated by Svelte v3.37.0 */
 
     // (25:26) 
     function create_if_block_5(ctx) {
@@ -3284,7 +3174,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\Module.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\Module.svelte generated by Svelte v3.37.0 */
     const file$2 = "src\\clickgui\\Module.svelte";
 
     function get_each_context$2(ctx, list, i) {
@@ -3319,7 +3209,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "settings svelte-xunng5");
-    			add_location(div, file$2, 46, 8, 1215);
+    			add_location(div, file$2, 46, 8, 1261);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -3472,8 +3362,8 @@ var app = (function () {
     			toggle_class(div0, "has-settings", /*settings*/ ctx[1].length > 0);
     			toggle_class(div0, "enabled", /*enabled*/ ctx[0]);
     			toggle_class(div0, "expanded", /*expanded*/ ctx[2]);
-    			add_location(div0, file$2, 44, 4, 1004);
-    			add_location(div1, file$2, 43, 0, 994);
+    			add_location(div0, file$2, 44, 4, 1048);
+    			add_location(div1, file$2, 43, 0, 1037);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3685,7 +3575,7 @@ var app = (function () {
     	}
     }
 
-    /* src\clickgui\Panel.svelte generated by Svelte v3.38.3 */
+    /* src\clickgui\Panel.svelte generated by Svelte v3.37.0 */
 
     const { console: console_1$1 } = globals;
     const file$1 = "src\\clickgui\\Panel.svelte";
@@ -3718,7 +3608,7 @@ var app = (function () {
     			create_component(module.$$.fragment);
     			t = space();
     			attr_dev(div, "class", "svelte-3om7h4");
-    			add_location(div, file$1, 85, 12, 2484);
+    			add_location(div, file$1, 85, 12, 2569);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -3815,20 +3705,20 @@ var app = (function () {
     			attr_dev(img, "class", "icon svelte-3om7h4");
     			if (img.src !== (img_src_value = "img/" + /*category*/ ctx[0].toLowerCase() + ".svg")) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "icon");
-    			add_location(img, file$1, 79, 8, 2185);
+    			add_location(img, file$1, 79, 8, 2264);
     			attr_dev(div0, "class", "title svelte-3om7h4");
-    			add_location(div0, file$1, 80, 8, 2264);
+    			add_location(div0, file$1, 80, 8, 2344);
     			attr_dev(div1, "class", "visibility-toggle svelte-3om7h4");
     			toggle_class(div1, "expanded", /*expanded*/ ctx[1]);
-    			add_location(div1, file$1, 81, 8, 2308);
+    			add_location(div1, file$1, 81, 8, 2389);
     			attr_dev(div2, "class", "title-wrapper svelte-3om7h4");
-    			add_location(div2, file$1, 78, 4, 2089);
+    			add_location(div2, file$1, 78, 4, 2167);
     			attr_dev(div3, "class", "modules svelte-3om7h4");
-    			add_location(div3, file$1, 83, 4, 2413);
+    			add_location(div3, file$1, 83, 4, 2496);
     			attr_dev(div4, "class", "panel svelte-3om7h4");
     			set_style(div4, "left", /*left*/ ctx[4] + "px");
     			set_style(div4, "top", /*top*/ ctx[3] + "px");
-    			add_location(div4, file$1, 77, 0, 2027);
+    			add_location(div4, file$1, 77, 0, 2104);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4118,7 +4008,7 @@ var app = (function () {
     	}
     }
 
-    /* src\ClickGui.svelte generated by Svelte v3.38.3 */
+    /* src\ClickGui.svelte generated by Svelte v3.37.0 */
 
     const { console: console_1 } = globals;
     const file = "src\\ClickGui.svelte";
