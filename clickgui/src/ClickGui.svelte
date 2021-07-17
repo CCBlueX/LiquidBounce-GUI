@@ -1,6 +1,18 @@
 <script>
-    import Panel from "./clickgui/Panel.svelte";
+    var isMousePressed = false;
+    function divMouseDown(e){
+            isMousePressed = true;
+    }
+    window.addEventListener("mouseup", function (e) {
+        isMousePressed = false;
+    });
+    window.addEventListener("mousemove", function (e) {
+        if (isMousePressed) {
+            window.scrollBy(-e.movementX, -e.movementY);
+        }
+    });
 
+    import Panel from "./clickgui/Panel.svelte";
     let clickGuiOpened = true;
 
     const categories = [
@@ -34,33 +46,23 @@
     function getModulesOfCategory(category) {
         return modules.filter((m) => m.category === category);
     }
-
-    var isMousePressed = false;
-    document.body.addEventListener("mousedown", function (e) {
-        isMousePressed = true;
-    });
-
-    window.addEventListener("mouseup", function (e) {
-        isMousePressed = false;
-    });
-    window.addEventListener("mousemove", function (e) {
-        if (isMousePressed) {
-            window.scrollBy(-e.movementX, -e.movementY);
-        }
-    });
 </script>
 
-<main>
-    {#if clickGuiOpened}
-        <div>
-            {#each categories as category}
-                <Panel {category} modules={getModulesOfCategory(category)} />
-            {/each}
-        </div>
-    {/if}
-</main>
+<div id="bg-drag" on:mousedown={divMouseDown}/>
+
+{#if clickGuiOpened}
+    {#each categories as category}
+        <Panel {category} modules={getModulesOfCategory(category)} />
+    {/each}
+{/if}
 
 <style>
+    #bg-drag {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        z-index: -100;
+    }
     :global(body) {
         margin: 0;
         background-color: rgba(0, 0, 0, 0.4);

@@ -29,10 +29,13 @@
 
         prevX = e.screenX;
         prevY = e.screenY;
+        
+        e.stopPropagation();
 	}
 	
-	function onMouseUp() {
+	function onMouseUp(e) {
 		moving = false;
+        e.stopPropagation();
         localStorage.setItem(`clickgui.panel.${category}.top`, top);
         localStorage.setItem(`clickgui.panel.${category}.left`, left);
 	}
